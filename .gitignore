@@ -1,0 +1,10 @@
+.idea
+.vscode
+__pycache__
+*.pyc
+dist
+.venv
+*.swp
+.pytest_cache
+.coverage
+coverage.xml
