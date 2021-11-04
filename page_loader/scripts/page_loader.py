@@ -1,5 +1,6 @@
 import argparse
 import os
+from page_loader import download
 
 
 def parse_args():
@@ -12,8 +13,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    for k, v in args.items():
-        print(f'{k}: {v}')
+    print(download(args.url, args.output))
 
 
 if __name__ == '__main__':

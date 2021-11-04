@@ -18,11 +18,11 @@ jobs:
                 pip install poetry
                 make install
 
-            - name: Run linter and pytest
+            - name: Run linter & pytest
               run: |
                 make lint
                 make test
-            - name: Test & publish code coverage
+            - name: Publish code coverage
               uses: paambaati/codeclimate-action@v2.7.4
               env:
                 CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
