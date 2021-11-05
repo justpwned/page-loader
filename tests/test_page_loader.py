@@ -1,3 +1,6 @@
+import pytest
+import requests
+
 from page_loader import download
 import os.path
 import requests_mock
@@ -17,3 +20,11 @@ def test_download(tmpdir, **kwargs):
     out_filepath = download(url, tmpdir)
     assert out_filepath == os.path.join(tmpdir, 'example-com.html')
     assert open(out_filepath).read() == expected_content
+
+
+@requests_mock.Mocker(kw='mock')
+def test_download_error(tmpdir, **kwargs):
+    url = 'https://example.com'
+    kwargs['mock'].get(url, status_code=404)
+    with pytest.raises(requests.HTTPError):
+        out_filepath = download(url, tmpdir)
