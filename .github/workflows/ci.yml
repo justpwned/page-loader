@@ -1,4 +1,4 @@
-name: CI
+name: Python Tests
 
 on: [push]
 
@@ -18,10 +18,10 @@ jobs:
                 pip install poetry
                 make install
 
-            - name: Run linter & pytest
+            - name: Run tests
               run: |
-                make lint
                 make test
+
             - name: Publish code coverage
               uses: paambaati/codeclimate-action@v2.7.4
               env:

@@ -26,5 +26,6 @@ def test_download(tmpdir, **kwargs):
 def test_download_error(tmpdir, **kwargs):
     url = 'https://example.com'
     kwargs['mock'].get(url, status_code=404)
-    with pytest.raises(requests.HTTPError):
+    with pytest.raises(requests.HTTPError) as ex:
         out_filepath = download(url, tmpdir)
+
