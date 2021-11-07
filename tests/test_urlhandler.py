@@ -1,6 +1,6 @@
 from page_loader.urlhandler import UrlHandler
 
-test_url = r'https://example.com/hello/there'
+test_url = 'https://example.com/hello/there'
 
 
 def test_geturl():
@@ -20,13 +20,17 @@ def test_local():
 
 def test_to_filepath():
     handler = UrlHandler(test_url)
-    assert handler.to_filepath() == 'example-com-hello-there'
     assert handler.to_filepath(only_netloc=True) == 'example-com'
+    assert handler.to_filepath() == 'example-com-hello-there'
 
 
 def test_to_filepath_ext():
-    test_url_ext = test_url + '.jpeg'
-    ext_handler = UrlHandler(test_url_ext)
+    ext_handler = UrlHandler('https://example.com/hello/there.jpeg')
     domen_handler = UrlHandler('https://example.com')
+    test_url_handler = UrlHandler(test_url)
     assert ext_handler.to_filepath() == 'example-com-hello-there.jpeg'
+    assert ext_handler.to_filepath('assets') == 'assets/example-com-hello-there.jpeg'
+    assert test_url_handler.to_filepath(mimetype='text/html') == 'example-com-hello-there.html'
+
     assert domen_handler.to_filepath() == 'example-com'
+    assert domen_handler.to_filepath(mimetype='text/html') == 'example-com.html'

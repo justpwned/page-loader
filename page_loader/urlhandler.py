@@ -1,10 +1,17 @@
-from urllib.parse import urlparse, ParseResult
+from urllib.parse import urlparse, ParseResult, urljoin
 import os.path
 import re
+import mimetypes
+
+mimetypes.init()
 
 
-def replace_aplha_to_char(old_string, char):
-    return re.sub(r'[^0-9a-zA-Z]', char, old_string)
+def get_mime_ext(content_type):
+    return mimetypes.guess_extension(content_type, strict=False) or ''
+
+
+def transform_url(url):
+    return re.sub(r'[^0-9a-zA-Z]', '-', url)
 
 
 class UrlHandler:
@@ -12,7 +19,10 @@ class UrlHandler:
         urlparsed = urlparse(url)
         self.scheme = urlparsed.scheme
         self.netloc = urlparsed.netloc
-        self.path = urlparsed[2:]  # iterable
+        path, etc = urlparsed.path, urlparsed[3:]  # iterable
+        if path == '/':
+            path = ''
+        self.path = (path,) + etc
 
     @property
     def is_local(self):
@@ -25,13 +35,38 @@ class UrlHandler:
             return url.replace(r'//', '', 1)
         return url
 
-    def to_filepath(self, only_netloc=False):
+    def to_filepath(self, out_dir='', mimetype='', *, only_netloc=False):
+        """
+        Note: If extension is not present in the "path" part of the url,
+        function uses supplied mimetype to guess the extension. If successful
+        it appends according extension to the filepath, otherwise it leaves
+        url as is.
+        """
         if only_netloc:
-            return replace_aplha_to_char(self.netloc, '-')
+            return os.path.join(out_dir, transform_url(self.netloc))
 
         url = self.get_url(strip_scheme=True)
-        ext = ''
-        if self.path[0]:
-            url, ext = os.path.splitext(url)
 
-        return replace_aplha_to_char(url, '-') + ext
+        gussed_ext = get_mime_ext(mimetype)
+        if not self.path[0]:
+            fullname = transform_url(url) + gussed_ext
+        else:
+            new_url, ext = os.path.splitext(url)
+            if ext == '':
+                ext = gussed_ext
+            fullname = transform_url(new_url) + ext
+
+        return os.path.join(out_dir, fullname)
+
+    def join(self, other_url):
+        if isinstance(other_url, UrlHandler):
+            other_url = other_url.get_url()
+        return urljoin(self.get_url(), other_url)
+
+    @staticmethod
+    def urljoin(url1, url2):
+        if isinstance(url1, UrlHandler):
+            url1 = url1.get_url()
+        if isinstance(url2, UrlHandler):
+            url2 = url2.get_url()
+        return urljoin(url1, url2)
