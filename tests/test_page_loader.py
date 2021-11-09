@@ -1,9 +1,21 @@
-import pytest
-import requests
-import re
 from page_loader import download
+from urllib.parse import urljoin
 import os.path
-import requests_mock
+
+PAGE_URL = 'https://example.com'
+HTML_FILENAME = 'example-com.html'
+ASSETS_DIR_NAME = 'example-com_files'
+
+ASSETS = [
+    {
+        'url_path': '/assets/test_image.jpg',
+        'filename': 'example-com-assets-test-image.jpg',
+    },
+]
+
+
+def read(filepath, mode='r'):
+    return open(filepath, mode).read()
 
 
 def get_fixture_path(filepath):
@@ -11,45 +23,36 @@ def get_fixture_path(filepath):
     return os.path.join(dirname, 'fixtures', filepath)
 
 
-def read_fixture_file(filename):
-    return open(get_fixture_path(filename)).read()
+def get_fixture_data(filename, mode='r'):
+    return read(get_fixture_path(filename), mode)
 
 
-def norm(string):
-    return re.sub(r'[\s]', '', string).lower()
+def test_download(tmpdir, requests_mock):
+    content = get_fixture_data(HTML_FILENAME)
+    requests_mock.get(PAGE_URL, text=content)
 
+    expected_html_filepath = get_fixture_path(os.path.join('expected', HTML_FILENAME))
+    expected_html_content = read(expected_html_filepath)
 
-@requests_mock.Mocker(kw='mock')
-def test_download(tmpdir, **kwargs):
-    url = 'https://example.com'
-    expected_filename = 'example-com.html'
-    expected_content = read_fixture_file(expected_filename)
-    kwargs['mock'].get(url, text=expected_content, headers={'content-type': 'text/html; charset=UTF-8'})
+    for asset in ASSETS:
+        asset_url = urljoin(PAGE_URL, asset['url_path'])
+        expected_asset_path = get_fixture_path(os.path.join('expected', ASSETS_DIR_NAME, asset['filename']))
+        expected_asset_content = read(expected_asset_path, 'rb')
+        asset['content'] = expected_asset_content
+        requests_mock.get(asset_url, content=expected_asset_content)
 
-    out_filepath = download(url, tmpdir)
-    assert out_filepath == os.path.join(tmpdir, expected_filename)
-    assert norm(open(out_filepath).read()) == norm(expected_content)
+    assert not os.listdir(tmpdir)
 
+    output_filepath = download(PAGE_URL, tmpdir)
+    assert len(os.listdir(tmpdir)) == 2
 
-@requests_mock.Mocker(kw='mock')
-def test_download_404(tmpdir, **kwargs):
-    url = 'https://example.com'
-    kwargs['mock'].get(url, status_code=404)
-    with pytest.raises(requests.HTTPError) as ex:
-        out_filepath = download(url, tmpdir)
+    tmp_assets_dir_name = os.path.join(tmpdir, ASSETS_DIR_NAME)
+    tmp_assets_listdir = os.listdir(tmp_assets_dir_name)
+    assert len(tmp_assets_listdir) == len(ASSETS)
 
+    assert read(output_filepath) == expected_html_content
 
-@requests_mock.Mocker(kw='mock')
-def test_download_with_images(tmpdir, **kwargs):
-    url = 'https://example.com/images'
-    expected_filename = 'example-com-images.html'
-    content = read_fixture_file(expected_filename)
-    expected_content = read_fixture_file('example-com-images_expected.html')
-    kwargs['mock'].get(url, text=content, headers={'content-type': 'text/html; charset=UTF-8'})
-    kwargs['mock'].get('https://example.com/assets/test_image1.jpg', content=b'')
-    kwargs['mock'].get('https://example.com/assets/test_image2.jpg', content=b'')
-    kwargs['mock'].get('https://example.com/assets/test_image3.jpg', content=b'')
-
-    out_filepath = download(url, tmpdir)
-    assert out_filepath == os.path.join(tmpdir, expected_filename)
-    assert norm(open(out_filepath).read()) == norm(expected_content)
+    for asset in ASSETS:
+        assert asset['filename'] in tmp_assets_listdir
+        asset_filepath = os.path.join(tmp_assets_dir_name, asset['filename'])
+        assert asset['content'] == read(asset_filepath, 'rb')

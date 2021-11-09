@@ -11,7 +11,6 @@ packages = [
 python = "^3.8"
 requests = "^2.26.0"
 beautifulsoup4 = "^4.10.0"
-lxml = "^4.6.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
@@ -25,3 +24,4 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 page-loader = "page_loader.scripts.page_loader:main"
+prettify = "page_loader.scripts.prettify:main"
