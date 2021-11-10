@@ -49,6 +49,8 @@ def extract_assets_from_html(html, assets_dir, base_urlhandler):
         if not orig_src:
             continue
 
+        logging.info(f'Downloading <{tag.name} {attr}={orig_src}>')
+
         orig_src_handler = UrlHandler(orig_src)
 
         # Uncomment next line when done

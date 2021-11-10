@@ -9,7 +9,7 @@ import page_loader
 def parse_args():
     parser = argparse.ArgumentParser(description='Download a web page')
     parser.add_argument('url', help='URL of the page to download')
-    parser.add_argument('--output', default=os.getcwd(),
+    parser.add_argument('-o', '--output', default=os.getcwd(),
                         help='Output directory (default: current directory)')
     parser.add_argument('--loglevel', default='error', choices=['debug', 'info', 'warning', 'error'],
                         help='Logging level (default: error)')
