@@ -40,11 +40,9 @@ TAGS_LINK_ATTR = {
 def extract_assets_from_html(html, assets_dir, base_urlhandler):
     soup = bs4.BeautifulSoup(html, 'html.parser')
 
-    logging.info(soup.prettify())
-
     assets = []
     tags = [tag for tag_name in TAGS_LINK_ATTR for tag in chain(soup(tag_name))]
-    bar = Bar(f'Extracting assets: ', max=len(tags))
+    bar = Bar('Extracting assets: ', max=len(tags))
     for tag in tags:
         attr = TAGS_LINK_ATTR[tag.name]
         orig_src = tag.get(attr)
