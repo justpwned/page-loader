@@ -56,7 +56,7 @@ def extract_assets_from_html(html, assets_dir, base_urlhandler):
         orig_src_handler = UrlHandler(orig_src)
 
         # Uncomment next line when done
-        if orig_src_handler.islocal:
+        if orig_src_handler.is_local(base_urlhandler):
             asset_url = base_urlhandler.join(orig_src)
             content, mimetype = download_asset(asset_url)
 

@@ -30,8 +30,9 @@ class UrlHandler:
     def path(self):
         return self._url.path
 
-    @property
-    def islocal(self):
+    def is_local(self, other=None):
+        if other is not None and self.netloc == other.netloc:
+            return True
         return len(self.scheme) == 0 and len(self.netloc) == 0
 
     def get_url(self, strip_scheme=False):
