@@ -17,7 +17,7 @@ def write_file(filepath, content):
 def download_asset(url):
     if isinstance(url, UrlHandler):
         url = url.get_url()
-    logging.info(f'Trying to download "{url}"')
+    logging.info(f'Downloading "{url}"')
     response = requests.get(url)
     response.raise_for_status()
     mimetype = response.headers.get('content-type', '').split(';')[0]
@@ -40,6 +40,8 @@ TAGS_LINK_ATTR = {
 def extract_assets_from_html(html, assets_dir, base_urlhandler):
     soup = bs4.BeautifulSoup(html, 'html.parser')
 
+    logging.info(soup.prettify())
+
     assets = []
     tags = [tag for tag_name in TAGS_LINK_ATTR for tag in chain(soup(tag_name))]
     bar = Bar(f'Extracting assets: ', max=len(tags))
@@ -49,7 +51,7 @@ def extract_assets_from_html(html, assets_dir, base_urlhandler):
         if not orig_src:
             continue
 
-        logging.info(f'Downloading <{tag.name} {attr}={orig_src}>')
+        logging.info(f'Extracting <{tag.name} {attr}={orig_src}>')
 
         orig_src_handler = UrlHandler(orig_src)
 
