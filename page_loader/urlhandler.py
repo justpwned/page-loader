@@ -30,6 +30,10 @@ class UrlHandler:
     def path(self):
         return self._url.path
 
+    @property
+    def islocal(self):
+        return len(self.scheme) == 0 and len(self.netloc) == 0
+
     def get_url(self, strip_scheme=False):
         if not strip_scheme:
             return self._url.geturl()
@@ -47,7 +51,7 @@ class UrlHandler:
         """
         How to determine file extension?
         1) if path has file extension then use it
-        2) if mimetype has been provided then use it if filepath has no extension,
+        2) if mimetype has been provided then use in case filepath has no extension,
            otherwise - ignore mimetype and use path extension
         3) if neither filepath extension nor mimetype is present, use '.html'
         """

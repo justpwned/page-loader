@@ -11,20 +11,20 @@ ASSETS = [
         'url_path': '/assets/test_image.jpg',
         'filename': 'example-com-assets-test-image.jpg',
     },
-    {
-        'url_path': 'https://images.unsplash.com/photo-1636453966235-a5e76101975c',
-        'filename': 'images-unsplash-com-photo-1636453966235-a5e76101975c.jpg',
-        'mimetype': 'image/jpeg'
-    },
+    # {
+    #     'url_path': 'https://images.unsplash.com/photo-1636453966235-a5e76101975c',
+    #     'filename': 'images-unsplash-com-photo-1636453966235-a5e76101975c.jpg',
+    #     'mimetype': 'image/jpeg'
+    # },
     {
         'url_path': '/assets/styles.css',
         'filename': 'example-com-assets-styles.css'
     },
-    {
-        'url_path': 'https://js.stripe.com/v3/',
-        'filename': 'js-stripe-com-v3-.js',
-        'mimetype': 'application/javascript'
-    }
+    # {
+    #     'url_path': 'https://js.stripe.com/v3/',
+    #     'filename': 'js-stripe-com-v3-.js',
+    #     'mimetype': 'application/javascript'
+    # }
 ]
 
 
