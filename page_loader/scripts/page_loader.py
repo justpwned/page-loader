@@ -18,9 +18,8 @@ def main():
         shutil.rmtree(args.output)
 
     os.mkdir(args.output)
-    out_filepaths = download(args.url, args.output)
-    # print('\n'.join(out_filepaths))
-    print(out_filepaths)
+    out_filepath = download(args.url, args.output)
+    print(out_filepath)
 
 
 if __name__ == '__main__':

@@ -55,7 +55,7 @@ class UrlHandler:
         joined_url = urllib.parse.urljoin(self.get_url(), other_url)
         return UrlHandler(joined_url)
 
-    def to_filepath(self, mimetype='', include_ext=True):
+    def to_filepath(self, mimetype=''):
         """
         How to determine file extension?
         1) if path has file extension then use it
@@ -63,9 +63,6 @@ class UrlHandler:
            otherwise - ignore mimetype and use path extension
         3) if neither filepath extension nor mimetype is present, use '.html'
         """
-        if not include_ext:
-            return _url_to_path(self.get_url(strip_scheme=True))
-
         path, ext = os.path.splitext(self.path)
         if not ext:
             guessed_ext = _get_mime_ext(mimetype)

@@ -22,4 +22,3 @@ def test_to_filepath_():
     handler = UrlHandler(TEST_URL)
     assert handler.to_filepath() == 'example-com-hello-there.html'
     assert handler.to_filepath(mimetype='image/jpeg') == 'example-com-hello-there.jpg'
-    assert handler.to_filepath(include_ext=False, mimetype='image/jpeg') == 'example-com-hello-there'
