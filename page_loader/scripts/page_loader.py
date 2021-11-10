@@ -1,5 +1,4 @@
 import argparse
-import shutil
 import os
 from page_loader import download
 
@@ -14,10 +13,9 @@ def parse_args():
 
 def main():
     args = parse_args()
-    if os.path.exists(args.output) and args.output != os.getcwd():
-        shutil.rmtree(args.output)
+    if not os.path.exists(args.output):
+        os.mkdir(args.output)
 
-    os.mkdir(args.output)
     out_filepath = download(args.url, args.output)
     print(out_filepath)
 

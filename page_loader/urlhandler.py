@@ -30,18 +30,6 @@ class UrlHandler:
     def path(self):
         return self._url.path
 
-    @property
-    def query(self):
-        return self._url.query
-
-    @property
-    def fragment(self):
-        return self._url.fragment
-
-    @property
-    def is_local(self):
-        return len(self.scheme) == 0 and len(self.netloc) == 0
-
     def get_url(self, strip_scheme=False):
         if not strip_scheme:
             return self._url.geturl()

@@ -11,6 +11,20 @@ ASSETS = [
         'url_path': '/assets/test_image.jpg',
         'filename': 'example-com-assets-test-image.jpg',
     },
+    {
+        'url_path': 'https://images.unsplash.com/photo-1636453966235-a5e76101975c',
+        'filename': 'images-unsplash-com-photo-1636453966235-a5e76101975c.jpg',
+        'mimetype': 'image/jpeg'
+    },
+    {
+        'url_path': '/assets/styles.css',
+        'filename': 'example-com-assets-styles.css'
+    },
+    {
+        'url_path': 'https://js.stripe.com/v3/',
+        'filename': 'js-stripe-com-v3-.js',
+        'mimetype': 'application/javascript'
+    }
 ]
 
 
@@ -39,7 +53,8 @@ def test_download(tmpdir, requests_mock):
         expected_asset_path = get_fixture_path(os.path.join('expected', ASSETS_DIR_NAME, asset['filename']))
         expected_asset_content = read(expected_asset_path, 'rb')
         asset['content'] = expected_asset_content
-        requests_mock.get(asset_url, content=expected_asset_content)
+        requests_mock.get(asset_url, content=expected_asset_content,
+                          headers={'content-type': asset.get('mimetype', '')})
 
     assert not os.listdir(tmpdir)
 

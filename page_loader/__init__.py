@@ -27,25 +27,33 @@ def save_assets(assets, asset_dir):
         write_file(filepath, content)
 
 
+TAGS_ATTR = {
+    'img': 'src',
+    'script': 'src',
+    'link': 'href'
+}
+
+
 def download_assets_from_html(html, assets_dir, base_urlhandler):
     soup = bs4.BeautifulSoup(html, 'html.parser')
 
     assets = []
-    images = soup.find_all('img')
-    for img in images:
-        orig_src = img.get('src')
-        if not orig_src:
-            continue
+    for tag, attr in TAGS_ATTR.items():
+        tags = soup.find_all(tag)
+        for t in tags:
+            orig_src = t.get(attr)
+            if not orig_src:
+                continue
 
-        img_url = base_urlhandler.join(orig_src)
-        img_content, img_mimetype = download_asset(img_url)
+            asset_url = base_urlhandler.join(orig_src)
+            content, mimetype = download_asset(asset_url)
 
-        orig_src_handler = UrlHandler(orig_src)
-        new_asset_name = base_urlhandler.join(orig_src_handler).to_filepath(img_mimetype)
-        new_src = os.path.join(assets_dir, new_asset_name)
+            orig_src_handler = UrlHandler(orig_src)
+            new_asset_name = base_urlhandler.join(orig_src_handler).to_filepath(mimetype)
+            new_src = os.path.join(assets_dir, new_asset_name)
 
-        img['src'] = new_src
-        assets.append((new_src, img_content))
+            t[attr] = new_src
+            assets.append((new_src, content))
 
     return soup.prettify(), assets
 

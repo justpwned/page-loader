@@ -10,14 +10,6 @@ def test_geturl():
     assert handler.get_url(strip_scheme=True) == no_scheme_test_url
 
 
-def test_local():
-    handler = UrlHandler(TEST_URL)
-    local_url = '/hello/there'
-    local_handler = UrlHandler(local_url)
-    assert handler.is_local is False
-    assert local_handler.is_local is True
-
-
 def test_to_filepath_():
     handler = UrlHandler(TEST_URL)
     assert handler.to_filepath() == 'example-com-hello-there.html'
