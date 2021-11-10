@@ -1,7 +1,8 @@
 import bs4
 import requests
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlsplit, SplitResult, urlunsplit
 from page_loader.urlhandler import UrlHandler
+import os.path
 
 # r = requests.get('https://example.com')
 # soup = bs4.BeautifulSoup(r.content, 'lxml')
@@ -19,7 +20,12 @@ url2 = 'https://google.com/assets/image1.png'
 # print(urljoin(url1, url2))
 # url = 'https://example.com/images'
 #
-# url_handler = UrlHandler(url)
+# url_handler = UrlHandler(url )
 # print(url_handler.to_filepath(only_netloc=True))
 
-print(urlparse(url1))
+path, ext = os.path.splitext('hellohel')
+print(path)
+print(ext)
+
+if not ext:
+    print('hell')

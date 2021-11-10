@@ -19,8 +19,8 @@ def read(filepath, mode='r'):
 
 
 def get_fixture_path(filepath):
-    dirname = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(dirname, 'fixtures', filepath)
+    # dirname = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join('fixtures', filepath)
 
 
 def get_fixture_data(filename, mode='r'):

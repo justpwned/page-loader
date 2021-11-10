@@ -55,7 +55,7 @@ class UrlHandler:
         joined_url = urllib.parse.urljoin(self.get_url(), other_url)
         return UrlHandler(joined_url)
 
-    def to_filepath(self, include_ext=True, mimetype=''):
+    def to_filepath(self, mimetype='', include_ext=True):
         """
         How to determine file extension?
         1) if path has file extension then use it

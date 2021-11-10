@@ -2,30 +2,8 @@ import requests
 import os
 import bs4
 import bs4.formatter
-import re
 from page_loader.urlhandler import UrlHandler
 
-# Monkeypatching bs4 prettify method to include a custom indent parameter
-orig_prettify = bs4.BeautifulSoup.prettify
-r = re.compile(r'^(\s*)', re.MULTILINE)
-
-
-def prettify(self, encoding=None, formatter="minimal", indent_width=4):
-    return r.sub(r'\1' * indent_width, orig_prettify(self, encoding, formatter))
-
-
-bs4.BeautifulSoup.prettify = prettify
-
-
-class UnsortedAttributes(bs4.formatter.HTMLFormatter):
-    def attributes(self, tag):
-        for k, v in tag.attrs.items():
-            if k == 'm':
-                continue
-            yield k, v
-
-
-# END
 
 def write_file(filepath, content):
     with open(filepath, 'wb') as fd:
@@ -37,62 +15,55 @@ def write_file(filepath, content):
 def download_asset(url):
     if isinstance(url, UrlHandler):
         url = url.get_url()
-    r = requests.get(url)
-    r.raise_for_status()
-    mimetype = r.headers.get('content-type', '').split(';')[0]
-    return r.content, mimetype
+    response = requests.get(url)
+    response.raise_for_status()
+    mimetype = response.headers.get('content-type', '').split(';')[0]
+    return response.content, mimetype
 
 
-def save_assets(assets, outdir):
+def save_assets(assets, asset_dir):
     for path, content in assets:
-        filepath = os.path.join(outdir, path)
+        filepath = os.path.join(asset_dir, path)
         write_file(filepath, content)
 
 
-def transform_assets_refs_to_local(html, out_dir, base_urlhandler):
+def download_assets_from_html(html, assets_dir, base_urlhandler):
     soup = bs4.BeautifulSoup(html, 'html.parser')
 
     assets = []
     images = soup.find_all('img')
     for img in images:
-        old_src = img.get('src')
-        if not old_src:
+        orig_src = img.get('src')
+        if not orig_src:
             continue
 
-        img_src_url = base_urlhandler.join(old_src)
-        img_content, img_mimetype = download_asset(img_src_url)
-        src_handler = UrlHandler(old_src)
-        if src_handler.is_local:
-            new_asset_name = f'{base_urlhandler.to_filepath(only_netloc=True)}-' \
-                             f'{src_handler.to_filepath(mimetype=img_mimetype).lstrip("-")}'
-            new_src = os.path.join(out_dir, new_asset_name)
-        else:
-            new_src = src_handler.to_filepath(out_dir, img_mimetype)
+        img_url = base_urlhandler.join(orig_src)
+        img_content, img_mimetype = download_asset(img_url)
+
+        orig_src_handler = UrlHandler(orig_src)
+        new_asset_name = base_urlhandler.join(orig_src_handler).to_filepath(img_mimetype)
+        new_src = os.path.join(assets_dir, new_asset_name)
 
         img['src'] = new_src
         assets.append((new_src, img_content))
 
-    # new_html, [(asset_content, path)]
-    return soup.prettify(formatter=UnsortedAttributes()), assets
+    return soup.prettify(), assets
 
 
-# TODO: LOTS of stuff to refactor
 def download(url, out_dir):
     content, mimetype = download_asset(url)
 
     url_handler = UrlHandler(url)
-    out_filepath = url_handler.to_filepath(mimetype=mimetype)
+    url_filepath = url_handler.to_filepath(mimetype)
 
-    if mimetype == 'text/html':
-        no_ext_out_filepath, _ = os.path.splitext(out_filepath)
-        assets_dir = f'{no_ext_out_filepath}_files'
-        content, assets = transform_assets_refs_to_local(content, assets_dir, url_handler)
+    if url_filepath.endswith('.html'):
+        assets_dir = f'{os.path.splitext(url_filepath)[0]}_files'
+        content, assets = download_assets_from_html(content, assets_dir, url_handler)
 
         if len(assets) > 0:
-            assets_out_dir = os.path.join(out_dir, assets_dir)
-            os.mkdir(assets_out_dir)
+            os.mkdir(os.path.join(out_dir, assets_dir))
             save_assets(assets, out_dir)
 
-    out_filepath = os.path.join(out_dir, out_filepath)
+    out_filepath = os.path.join(out_dir, url_filepath)
     write_file(out_filepath, content)
     return out_filepath
