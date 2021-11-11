@@ -5,6 +5,7 @@ from page_loader.urlhandler import UrlHandler
 from itertools import chain
 from page_loader.progressbar import ProgressBar
 from page_loader.exceptions import *
+import logging
 
 
 def write_file(filepath, content):
@@ -35,15 +36,24 @@ def save_assets(assets, asset_dir):
 TAGS_LINK_ATTR = {
     'img': 'src',
     'script': 'src',
-    'link': 'href'
+    'link': 'href',
+    'audio': 'src',
+    'video': 'src',
+    'source': 'src',
+    'object': 'data',
+    'track': 'src'
 }
+
+
+def format_html(html):
+    return str(html)
 
 
 def extract_assets_from_html(html, assets_dir, base_urlhandler):
     soup = bs4.BeautifulSoup(html, 'html.parser')
 
     assets = []
-    tags = [tag for tag_name in TAGS_LINK_ATTR for tag in chain(soup(tag_name))]
+    tags = [tag for tag_name in TAGS_LINK_ATTR for tag in chain(soup.find_all(tag_name)) if tag.get(TAGS_LINK_ATTR[tag_name])]
 
     bar = ProgressBar('Extracting assets: ', max=len(tags))
     for tag in tags:
@@ -53,7 +63,11 @@ def extract_assets_from_html(html, assets_dir, base_urlhandler):
             continue
 
         asset_url = base_urlhandler.join(orig_src)
-        content, mimetype = download_asset(asset_url)
+        try:
+            content, mimetype = download_asset(asset_url)
+        except RequestException as ex:
+            continue
+
         new_asset_name = asset_url.to_filepath(mimetype)
         new_src = os.path.join(assets_dir, new_asset_name)
         tag[attr] = new_src
@@ -61,11 +75,15 @@ def extract_assets_from_html(html, assets_dir, base_urlhandler):
         bar.next()
 
     bar.finish()
-    return soup.prettify(), assets
+    return format_html(soup), assets
 
 
 def download(url, out_dir):
-    content, mimetype = download_asset(url)
+    try:
+        content, mimetype = download_asset(url)
+    except RequestException as ex:
+        logging.error(str(ex))
+        raise
 
     url_handler = UrlHandler(url)
     url_filepath = url_handler.to_filepath(mimetype)

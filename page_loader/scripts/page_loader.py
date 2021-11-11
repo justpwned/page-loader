@@ -15,15 +15,14 @@ def parse_args():
 
 def main():
     args = parse_args()
-    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.ERROR)
+    logging.basicConfig(format='\n%(levelname)s: %(message)s', level=logging.WARNING)
 
     try:
         if not os.path.exists(args.output) or not os.path.isdir(args.output):
             os.mkdir(args.output)
         out_filepath = download(args.url, args.output)
         print(out_filepath)
-    except (RequestException, PermissionException) as ex:
-        logging.error(str(ex))
+    except PageLoaderException:
         sys.exit(1)
 
 

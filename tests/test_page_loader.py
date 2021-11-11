@@ -29,6 +29,13 @@ ASSETS = [
 ]
 
 
+def mock_format_html(html):
+    return html.prettify()
+
+
+page_loader.loader.format_html = mock_format_html
+
+
 def read(filepath, mode='r'):
     return open(filepath, mode).read()
 
