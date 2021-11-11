@@ -20,7 +20,8 @@ def main():
     try:
         if not os.path.exists(args.output) or not os.path.isdir(args.output):
             os.mkdir(args.output)
-        print(download(args.url, args.output))
+        out_filepath = download(args.url, args.output)
+        print(out_filepath)
     except (RequestException, PermissionException) as ex:
         logging.error(str(ex))
         sys.exit(1)
