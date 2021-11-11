@@ -18,7 +18,7 @@ def test_is_local():
     assert handler2.is_local()
 
 
-def test_to_filepath_():
+def test_to_filepath():
     handler = UrlHandler(TEST_URL)
     assert handler.to_filepath() == 'example-com-hello-there.html'
     assert handler.to_filepath(mimetype='image/jpeg') == 'example-com-hello-there.jpg'

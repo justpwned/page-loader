@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "hexlet-code"
+name = "page-loader"
 version = "0.1.0"
 description = ""
 authors = ["justpwned <justpwnedfrom@gmail.com>"]
@@ -25,4 +25,3 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 page-loader = "page_loader.scripts.page_loader:main"
-prettify = "page_loader.scripts.prettify:main"
