@@ -53,7 +53,8 @@ def extract_assets_from_html(html, assets_dir, base_urlhandler):
     soup = bs4.BeautifulSoup(html, 'html.parser')
 
     assets = []
-    tags = [tag for tag_name in TAGS_LINK_ATTR for tag in chain(soup.find_all(tag_name)) if tag.get(TAGS_LINK_ATTR[tag_name])]
+    tags = [tag for tag_name in TAGS_LINK_ATTR for tag in chain(soup.find_all(tag_name)) if
+            tag.get(TAGS_LINK_ATTR[tag_name])]
 
     bar = ProgressBar('Extracting assets: ', max=len(tags))
     for tag in tags:
@@ -65,7 +66,7 @@ def extract_assets_from_html(html, assets_dir, base_urlhandler):
         asset_url = base_urlhandler.join(orig_src)
         try:
             content, mimetype = download_asset(asset_url)
-        except RequestException as ex:
+        except RequestException:
             continue
 
         new_asset_name = asset_url.to_filepath(mimetype)
