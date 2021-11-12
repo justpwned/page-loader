@@ -67,6 +67,7 @@ def extract_assets_from_html(html, assets_dir, base_urlhandler):
         try:
             content, mimetype = download_asset(asset_url)
         except RequestException:
+            bar.next()
             continue
 
         new_asset_name = asset_url.to_filepath(mimetype)
