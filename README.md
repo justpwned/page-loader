@@ -9,10 +9,10 @@ Page Loader is a command line tool and library for downloading web pages.
 ## How it works
 
 Page Loader sends GET HTTP request to the user specified resource. If a requested web page happens to be an HTML
-document it will also download any required assets contained in
-```img``` ```script``` ```link``` ```audio``` ```video``` ```source``` ```object``` ```track``` tags and replaces their
-source attributes to valid file paths with the extension being determined based on the mimetype. If downloading an asset
-results in an HTTP error, the program will ignore it and proceed with downloading remaining assets.
+document it will also download its assets contained in
+```img``` ```script``` ```link``` ```audio``` ```video``` ```source``` ```object``` ```track``` tags and replace their
+source attribute values with valid local file paths. If downloading an asset
+results in an HTTP error, the program will ignore it and proceed with loading remaining assets.
 *Unfortunately though*, due to the way that a lot of modern websites are built (lots of dynamically generated content,
 styles, etc.)
 it's not always possible to download a page preserving its original design
