@@ -80,7 +80,7 @@ def extract_assets_from_html(html, assets_dir, base_urlhandler):
     return format_html(soup), assets
 
 
-def download(url, out_dir):
+def download(url, out_dir=os.getcwd()):
     try:
         content, mimetype = download_asset(url)
     except RequestException as ex:
