@@ -49,19 +49,23 @@ def format_html(html):
     return str(html)
 
 
+def include_tag(tag, tag_name):
+    if tag_name != 'link':
+        return tag.get(TAGS_LINK_ATTR[tag_name])
+    rel = tag.get('rel', ' ')[0]
+    return rel in ('stylesheet', 'icon')
+
+
 def extract_assets_from_html(html, assets_dir, base_urlhandler):
     soup = bs4.BeautifulSoup(html, 'html.parser')
 
     assets = []
-    tags = [tag for tag_name in TAGS_LINK_ATTR for tag in chain(soup.find_all(tag_name)) if
-            tag.get(TAGS_LINK_ATTR[tag_name])]
+    tags = [tag for tag_name in TAGS_LINK_ATTR for tag in chain(soup.find_all(tag_name)) if include_tag(tag, tag_name)]
 
     bar = ProgressBar('Extracting assets: ', max=len(tags))
     for tag in tags:
         attr = TAGS_LINK_ATTR[tag.name]
         orig_src = tag.get(attr)
-        if not orig_src:
-            continue
 
         asset_url = base_urlhandler.join(orig_src)
         try:
